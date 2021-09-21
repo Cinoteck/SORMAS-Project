@@ -1,17 +1,14 @@
 /*
  * SORMAS® - Surveillance Outbreak Response Management & Analysis System
  * Copyright © 2016-2021 Helmholtz-Zentrum für Infektionsforschung GmbH (HZI)
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
@@ -61,14 +58,18 @@ import de.symeda.sormas.backend.infrastructure.district.DistrictService;
 import de.symeda.sormas.backend.infrastructure.facility.Facility;
 import de.symeda.sormas.backend.infrastructure.region.Region;
 import de.symeda.sormas.backend.infrastructure.region.RegionFacadeEjb;
+import de.symeda.sormas.backend.sormastosormas.rest.SormasToSormasRestClient;
 import de.symeda.sormas.backend.user.UserService;
 import de.symeda.sormas.backend.util.DtoHelper;
 import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless(name = "CommunityFacade")
 public class CommunityFacadeEjb implements CommunityFacade {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(CommunityFacadeEjb.class);
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;
 
@@ -85,7 +86,7 @@ public class CommunityFacadeEjb implements CommunityFacade {
 	public List<CommunityReferenceDto> getAllActiveByDistrict(String districtUuid) {
 
 		District district = districtService.getByUuid(districtUuid);
-		return district.getCommunities().stream().filter(c -> !c.isArchived()).map(f -> toReferenceDto(f)).collect(Collectors.toList());
+		return district.getCommunities().stream().filter(c -> !c.isArchived()).map(CommunityFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
 	@Override
@@ -246,7 +247,7 @@ public class CommunityFacadeEjb implements CommunityFacade {
 
 	@Override
 	public List<CommunityDto> getByUuids(List<String> uuids) {
-		return communityService.getByUuids(uuids).stream().map(c -> toDto(c)).collect(Collectors.toList());
+		return communityService.getByUuids(uuids).stream().map(this::toDto).collect(Collectors.toList());
 	}
 
 	@Override
@@ -305,6 +306,12 @@ public class CommunityFacadeEjb implements CommunityFacade {
 					CommunityDto dtoToMerge = getByUuid(uuid);
 					dto = DtoHelper.copyDtoValues(dtoToMerge, dto, true);
 				} else {
+					LOGGER.error(
+						"There are duplicate communities for Community {}, {}, {}, {}",
+						dto.getName(),
+						dto.getDistrict(),
+						dto.getRegion(),
+						dto.getUuid());
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importCommunityAlreadyExists));
 				}
 			}
