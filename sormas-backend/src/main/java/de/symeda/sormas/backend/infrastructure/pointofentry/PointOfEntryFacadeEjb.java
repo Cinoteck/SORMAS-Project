@@ -53,7 +53,8 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "PointOfEntryFacade")
-public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntry, PointOfEntryService> implements PointOfEntryFacade {
+public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntry, PointOfEntryDto, PointOfEntryService>
+	implements PointOfEntryFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;
@@ -178,11 +179,6 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 			.stream()
 			.map(PointOfEntryFacadeEjb::toReferenceDto)
 			.collect(Collectors.toList());
-	}
-
-	@Override
-	public PointOfEntryDto save(@Valid PointOfEntryDto dto) throws ValidationRuntimeException {
-		return save(dto, false);
 	}
 
 	@Override

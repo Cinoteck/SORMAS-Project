@@ -66,7 +66,7 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "CommunityFacade")
-public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, CommunityService> implements CommunityFacade {
+public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, CommunityDto, CommunityService> implements CommunityFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;
@@ -259,11 +259,6 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 		cq.multiselect(root.get(Community.UUID), districtJoin.get(District.UUID));
 
 		return em.createQuery(cq).getResultList().stream().collect(Collectors.toMap(e -> (String) e[0], e -> (String) e[1]));
-	}
-
-	@Override
-	public CommunityDto save(@Valid CommunityDto dto) throws ValidationRuntimeException {
-		return save(dto, false);
 	}
 
 	@Override

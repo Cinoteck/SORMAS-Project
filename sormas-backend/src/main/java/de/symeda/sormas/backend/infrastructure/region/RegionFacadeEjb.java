@@ -72,7 +72,7 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "RegionFacade")
-public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionService> implements RegionFacade {
+public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto, RegionService> implements RegionFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;
@@ -335,11 +335,6 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionSer
 		dto.setCountry(CountryFacadeEjb.toReferenceDto(entity.getCountry()));
 
 		return dto;
-	}
-
-	@Override
-	public RegionDto save(@Valid RegionDto dto) throws ValidationRuntimeException {
-		return save(dto, false);
 	}
 
 	@Override

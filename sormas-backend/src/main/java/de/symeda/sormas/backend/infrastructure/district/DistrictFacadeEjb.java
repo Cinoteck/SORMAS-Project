@@ -70,7 +70,7 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "DistrictFacade")
-public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, DistrictService> implements DistrictFacade {
+public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, DistrictDto, DistrictService> implements DistrictFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;
@@ -94,21 +94,21 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 
 	@Override
 	public List<DistrictReferenceDto> getAllActiveAsReference() {
-		return service.getAllActive(District.NAME, true).stream().map(f -> toReferenceDto(f)).collect(Collectors.toList());
+		return service.getAllActive(District.NAME, true).stream().map(DistrictFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<DistrictReferenceDto> getAllActiveByArea(String areaUuid) {
 
 		Area area = areaService.getByUuid(areaUuid);
-		return service.getAllActiveByArea(area).stream().map(f -> toReferenceDto(f)).collect(Collectors.toList());
+		return service.getAllActiveByArea(area).stream().map(DistrictFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
 	@Override
 	public List<DistrictReferenceDto> getAllActiveByRegion(String regionUuid) {
 
 		Region region = regionService.getByUuid(regionUuid);
-		return region.getDistricts().stream().filter(d -> !d.isArchived()).map(f -> toReferenceDto(f)).collect(Collectors.toList());
+		return region.getDistricts().stream().filter(d -> !d.isArchived()).map(DistrictFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
 	@Override
@@ -280,11 +280,6 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 		cq.multiselect(root.get(District.UUID), regionJoin.get(Region.UUID));
 
 		return em.createQuery(cq).getResultList().stream().collect(Collectors.toMap(e -> (String) e[0], e -> (String) e[1]));
-	}
-
-	@Override
-	public DistrictDto save(@Valid DistrictDto dto) throws ValidationRuntimeException {
-		return save(dto, false);
 	}
 
 	@Override

@@ -1,10 +1,14 @@
 package de.symeda.sormas.backend;
 
+import de.symeda.sormas.api.EntityDto;
+import de.symeda.sormas.api.infrastructure.area.AreaDto;
 import de.symeda.sormas.backend.common.AbstractDomainObject;
 import de.symeda.sormas.backend.common.AdoServiceWithUserFilter;
 
+import javax.validation.Valid;
+
 // todo should we use BaseAdoService?
-public abstract class AbstractBaseEjb<ADO extends AbstractDomainObject, SRV extends AdoServiceWithUserFilter<ADO>> {
+public abstract class AbstractBaseEjb<ADO extends AbstractDomainObject, DTO extends EntityDto, SRV extends AdoServiceWithUserFilter<ADO>> {
 
 	protected SRV service;
 
@@ -20,4 +24,10 @@ public abstract class AbstractBaseEjb<ADO extends AbstractDomainObject, SRV exte
 	public abstract void archive(String uuid);
 
 	public abstract void dearchive(String uuid);
+
+	public DTO save(@Valid DTO dto) {
+		return save(dto, false);
+	}
+
+	public abstract DTO save(@Valid DTO dto, boolean allowMerge);
 }

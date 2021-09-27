@@ -63,7 +63,8 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "SubcontinentFacade")
-public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinent, SubcontinentService> implements SubcontinentFacade {
+public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinent, SubcontinentDto, SubcontinentService>
+	implements SubcontinentFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;
@@ -111,7 +112,11 @@ public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinen
 	@Override
 	public List<SubcontinentReferenceDto> getAllActiveByContinent(String uuid) {
 		Continent continent = continentService.getByUuid(uuid);
-		return continent.getSubcontinents().stream().filter(d -> !d.isArchived()).map(SubcontinentFacadeEjb::toReferenceDto).collect(Collectors.toList());
+		return continent.getSubcontinents()
+			.stream()
+			.filter(d -> !d.isArchived())
+			.map(SubcontinentFacadeEjb::toReferenceDto)
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -213,11 +218,6 @@ public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinen
 			.map(SubcontinentFacadeEjb::toReferenceDto)
 			.sorted(Comparator.comparing(SubcontinentReferenceDto::getCaption))
 			.collect(Collectors.toList());
-	}
-
-	@Override
-	public SubcontinentDto save(@Valid SubcontinentDto dto) {
-		return save(dto, false);
 	}
 
 	@Override

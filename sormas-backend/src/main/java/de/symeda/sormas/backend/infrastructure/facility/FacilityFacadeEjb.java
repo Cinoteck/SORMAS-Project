@@ -78,7 +78,7 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "FacilityFacade")
-public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, FacilityService> implements FacilityFacade {
+public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, FacilityDto, FacilityService> implements FacilityFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;
@@ -587,11 +587,6 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 
 		cq.select(cb.count(root));
 		return em.createQuery(cq).getSingleResult();
-	}
-
-	@Override
-	public FacilityDto save(@Valid FacilityDto dto) throws ValidationRuntimeException {
-		return save(dto, false);
 	}
 
 	@Override
