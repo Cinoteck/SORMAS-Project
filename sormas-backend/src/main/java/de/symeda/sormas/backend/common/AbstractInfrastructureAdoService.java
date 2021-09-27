@@ -11,6 +11,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.symeda.sormas.api.EntityRelevanceStatus;
+import de.symeda.sormas.backend.infrastructure.area.Area;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 public abstract class AbstractInfrastructureAdoService<ADO extends InfrastructureAdo> extends AdoServiceWithUserFilter<ADO> {
@@ -109,4 +110,6 @@ public abstract class AbstractInfrastructureAdoService<ADO extends Infrastructur
 	}
 
 	public abstract List<ADO> getByExternalId(String externalId, boolean includeArchived);
+
+
 }

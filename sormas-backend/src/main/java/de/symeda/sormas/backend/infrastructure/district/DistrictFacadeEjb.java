@@ -283,35 +283,33 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 	}
 
 	@Override
-	public DistrictDto save(@Valid DistrictDto dto, boolean allowMerge) throws ValidationRuntimeException {
+	public DistrictDto save(@Valid DistrictDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
 
 		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
 		}
 
-		if (dto.getRegion() == null) {
+		if (dtoToSave.getRegion() == null) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.validRegion));
 		}
 
-		District district = service.getByUuid(dto.getUuid());
+		District district = service.getByUuid(dtoToSave.getUuid());
 
 		if (district == null) {
-			List<DistrictReferenceDto> duplicates = getByName(dto.getName(), dto.getRegion(), true);
+			List<DistrictReferenceDto> duplicates = getByName(dtoToSave.getName(), dtoToSave.getRegion(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					String uuid = duplicates.get(0).getUuid();
 					district = service.getByUuid(uuid);
 					DistrictDto dtoToMerge = getDistrictByUuid(uuid);
-					dto = DtoHelper.copyDtoValues(dtoToMerge, dto, true);
+					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importDistrictAlreadyExists));
 				}
 			}
 		}
 
-		district = fillOrBuildEntity(dto, district, true);
-		service.ensurePersisted(district);
-		return toDto(district);
+		return persist(dtoToSave, district);
 	}
 
 	@Override
@@ -421,7 +419,7 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 		return dto;
 	}
 
-	private District fillOrBuildEntity(@NotNull DistrictDto source, District target, boolean checkChangeDate) {
+	protected void fillOrBuildEntity(@NotNull DistrictDto source, District target, boolean checkChangeDate) {
 
 		target = DtoHelper.fillOrBuildEntity(source, target, District::new, checkChangeDate);
 
@@ -432,7 +430,6 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 		target.setArchived(source.isArchived());
 		target.setExternalID(source.getExternalID());
 
-		return target;
 	}
 
 	@Override

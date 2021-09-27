@@ -338,30 +338,28 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto
 	}
 
 	@Override
-	public RegionDto save(@Valid RegionDto dto, boolean allowMerge) throws ValidationRuntimeException {
+	public RegionDto save(@Valid RegionDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
 
 		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
 		}
 
-		Region region = service.getByUuid(dto.getUuid());
+		Region region = service.getByUuid(dtoToSave.getUuid());
 
 		if (region == null) {
-			List<Region> duplicates = service.getByName(dto.getName(), true);
+			List<Region> duplicates = service.getByName(dtoToSave.getName(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					region = duplicates.get(0);
 					RegionDto dtoToMerge = getByUuid(region.getUuid());
-					dto = DtoHelper.copyDtoValues(dtoToMerge, dto, true);
+					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importRegionAlreadyExists));
 				}
 			}
 		}
 
-		region = fillOrBuildEntity(dto, region, true);
-		service.ensurePersisted(region);
-		return toDto(region);
+		return persist(dtoToSave, region);
 	}
 
 	@Override
@@ -394,7 +392,7 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto
 		return em.createQuery(cq).getResultList().stream().map(RegionFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
-	private Region fillOrBuildEntity(@NotNull RegionDto source, Region target, boolean checkChangeDate) {
+	protected void fillOrBuildEntity(@NotNull RegionDto source, Region target, boolean checkChangeDate) {
 
 		target = DtoHelper.fillOrBuildEntity(source, target, Region::new, checkChangeDate);
 
@@ -406,7 +404,6 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto
 		target.setArea(areaService.getByReferenceDto(source.getArea()));
 		target.setCountry(countryService.getByReferenceDto(source.getCountry()));
 
-		return target;
 	}
 
 	@LocalBean

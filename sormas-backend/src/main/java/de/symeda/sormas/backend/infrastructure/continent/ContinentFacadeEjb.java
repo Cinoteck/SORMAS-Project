@@ -190,31 +190,28 @@ public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, Con
 	}
 
 	@Override
-	public ContinentDto save(@Valid ContinentDto dto, boolean allowMerge) {
+	public ContinentDto save(@Valid ContinentDto dtoToSave, boolean allowMerge) {
 
 		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
 		}
 
-		Continent continent = service.getByUuid(dto.getUuid());
+		Continent continent = service.getByUuid(dtoToSave.getUuid());
 
 		if (continent == null) {
-			List<Continent> duplicates = service.getByDefaultName(dto.getDefaultName(), true);
+			List<Continent> duplicates = service.getByDefaultName(dtoToSave.getDefaultName(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					continent = duplicates.get(0);
 					ContinentDto dtoToMerge = getByUuid(continent.getUuid());
-					dto = DtoHelper.copyDtoValues(dtoToMerge, dto, true);
+					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importContinentAlreadyExists));
 				}
 			}
 		}
 
-		continent = fillOrBuildEntity(dto, continent, true);
-		service.ensurePersisted(continent);
-
-		return toDto(continent);
+		return persist(dtoToSave, continent);
 	}
 
 	@Override
@@ -261,14 +258,12 @@ public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, Con
 		return service.getByDefaultName(name, includeArchived).stream().map(ContinentFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
-	private Continent fillOrBuildEntity(@NotNull ContinentDto source, Continent target, boolean checkChangeDate) {
+	protected void fillOrBuildEntity(@NotNull ContinentDto source, Continent target, boolean checkChangeDate) {
 		target = DtoHelper.fillOrBuildEntity(source, target, Continent::new, checkChangeDate);
 
 		target.setDefaultName(source.getDefaultName());
 		target.setArchived(source.isArchived());
 		target.setExternalId(source.getExternalId());
-
-		return target;
 	}
 
 	@LocalBean

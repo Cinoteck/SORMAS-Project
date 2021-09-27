@@ -404,7 +404,7 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 		return new FacilityReferenceDto(entity.getUuid(), entity.toString(), entity.getExternalID());
 	}
 
-	private FacilityDto toDto(Facility entity) {
+	public FacilityDto toDto(Facility entity) {
 
 		if (entity == null) {
 			return null;
@@ -590,29 +590,28 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 	}
 
 	@Override
-	public FacilityDto save(@Valid FacilityDto dto, boolean allowMerge) throws ValidationRuntimeException {
+	public FacilityDto save(@Valid FacilityDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
 
-		validateFacilityDto(dto);
+		validateFacilityDto(dtoToSave);
 
-		Facility facility = service.getByUuid(dto.getUuid());
+		Facility facility = service.getByUuid(dtoToSave.getUuid());
 
 		if (facility == null) {
-			List<FacilityReferenceDto> duplicates = getByNameAndType(dto.getName(), dto.getDistrict(), dto.getCommunity(), dto.getType(), true);
+			List<FacilityReferenceDto> duplicates =
+				getByNameAndType(dtoToSave.getName(), dtoToSave.getDistrict(), dtoToSave.getCommunity(), dtoToSave.getType(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					String uuid = duplicates.get(0).getUuid();
 					facility = service.getByUuid(uuid);
 					FacilityDto dtoToMerge = getByUuid(uuid);
-					dto = DtoHelper.copyDtoValues(dtoToMerge, dto, true);
+					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importFacilityAlreadyExists));
 				}
 			}
 		}
 
-		facility = fillOrBuildEntity(dto, facility, true);
-		service.ensurePersisted(facility);
-		return toDto(facility);
+		return persist(dtoToSave, facility);
 	}
 
 	@Override
@@ -637,7 +636,7 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 		}
 	}
 
-	private Facility fillOrBuildEntity(@NotNull FacilityDto source, Facility target, boolean checkChangeDate) {
+	protected void fillOrBuildEntity(@NotNull FacilityDto source, Facility target, boolean checkChangeDate) {
 
 		target = DtoHelper.fillOrBuildEntity(source, target, Facility::new, checkChangeDate);
 
@@ -663,8 +662,6 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 		target.setType(source.getType());
 		target.setArchived(source.isArchived());
 		target.setExternalID(source.getExternalID());
-
-		return target;
 	}
 
 	@LocalBean

@@ -221,32 +221,29 @@ public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinen
 	}
 
 	@Override
-	public SubcontinentDto save(@Valid SubcontinentDto dto, boolean allowMerge) {
+	public SubcontinentDto save(@Valid SubcontinentDto dtoToSave, boolean allowMerge) {
 
 		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
 		}
 
-		Subcontinent subcontinent = service.getByUuid(dto.getUuid());
+		Subcontinent subcontinent = service.getByUuid(dtoToSave.getUuid());
 
 		if (subcontinent == null) {
-			List<SubcontinentReferenceDto> duplicates = getByDefaultName(dto.getDefaultName(), true);
+			List<SubcontinentReferenceDto> duplicates = getByDefaultName(dtoToSave.getDefaultName(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					String uuid = duplicates.get(0).getUuid();
 					subcontinent = service.getByUuid(uuid);
 					SubcontinentDto dtoToMerge = getByUuid(uuid);
-					dto = DtoHelper.copyDtoValues(dtoToMerge, dto, true);
+					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importSubcontinentAlreadyExists));
 				}
 			}
 		}
 
-		subcontinent = fillOrBuildEntity(dto, subcontinent, true);
-		service.ensurePersisted(subcontinent);
-
-		return toDto(subcontinent);
+		return persist(dtoToSave, subcontinent);
 	}
 
 	@Override
@@ -295,15 +292,13 @@ public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinen
 		return service.getByDefaultName(caption, includeArchived).stream().map(SubcontinentFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
-	private Subcontinent fillOrBuildEntity(@NotNull SubcontinentDto source, Subcontinent target, boolean checkChangeDate) {
+	protected void fillOrBuildEntity(@NotNull SubcontinentDto source, Subcontinent target, boolean checkChangeDate) {
 		target = DtoHelper.fillOrBuildEntity(source, target, Subcontinent::new, checkChangeDate);
 
 		target.setDefaultName(source.getDefaultName());
 		target.setArchived(source.isArchived());
 		target.setExternalId(source.getExternalId());
 		target.setContinent(continentService.getByReferenceDto(source.getContinent()));
-
-		return target;
 	}
 
 	@LocalBean

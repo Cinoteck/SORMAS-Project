@@ -182,32 +182,30 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 	}
 
 	@Override
-	public PointOfEntryDto save(@Valid PointOfEntryDto dto, boolean allowMerge) throws ValidationRuntimeException {
+	public PointOfEntryDto save(@Valid PointOfEntryDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
 
-		validate(dto);
+		validate(dtoToSave);
 
 		PointOfEntry pointOfEntry = null;
-		if (dto.getUuid() != null) {
-			pointOfEntry = service.getByUuid(dto.getUuid());
+		if (dtoToSave.getUuid() != null) {
+			pointOfEntry = service.getByUuid(dtoToSave.getUuid());
 		}
 
 		if (pointOfEntry == null) {
-			List<PointOfEntryReferenceDto> duplicates = getByName(dto.getName(), dto.getDistrict(), true);
+			List<PointOfEntryReferenceDto> duplicates = getByName(dtoToSave.getName(), dtoToSave.getDistrict(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					String uuid = duplicates.get(0).getUuid();
 					pointOfEntry = service.getByUuid(uuid);
 					PointOfEntryDto dtoToMerge = getByUuid(uuid);
-					dto = DtoHelper.copyDtoValues(dtoToMerge, dto, true);
+					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importPointOfEntryAlreadyExists));
 				}
 			}
 		}
 
-		pointOfEntry = fillOrBuildEntity(dto, pointOfEntry, true);
-		service.ensurePersisted(pointOfEntry);
-		return toDto(pointOfEntry);
+		return persist(dtoToSave, pointOfEntry);
 	}
 
 	@Override
@@ -347,7 +345,7 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 		return QueryHelper.getFirstResult(em, cq) != null;
 	}
 
-	private PointOfEntry fillOrBuildEntity(@NotNull PointOfEntryDto source, PointOfEntry target, boolean checkChangeDate) {
+	protected void fillOrBuildEntity(@NotNull PointOfEntryDto source, PointOfEntry target, boolean checkChangeDate) {
 
 		target = DtoHelper.fillOrBuildEntity(source, target, PointOfEntry::new, checkChangeDate);
 
@@ -360,11 +358,9 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 		target.setDistrict(districtService.getByReferenceDto(source.getDistrict()));
 		target.setArchived(source.isArchived());
 		target.setExternalID(source.getExternalID());
-
-		return target;
 	}
 
-	private PointOfEntryDto toDto(PointOfEntry entity) {
+	public PointOfEntryDto toDto(PointOfEntry entity) {
 
 		if (entity == null) {
 			return null;

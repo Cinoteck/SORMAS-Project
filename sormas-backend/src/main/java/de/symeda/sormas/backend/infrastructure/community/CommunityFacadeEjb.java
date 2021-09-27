@@ -110,6 +110,7 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 	}
 
 	// Need to be in the same order as in the constructor
+
 	private void selectDtoFields(CriteriaQuery<CommunityDto> cq, Root<Community> root) {
 
 		Join<Community, District> district = root.join(Community.DISTRICT, JoinType.LEFT);
@@ -262,34 +263,32 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 	}
 
 	@Override
-	public CommunityDto save(@Valid CommunityDto dto, boolean allowMerge) throws ValidationRuntimeException {
+	public CommunityDto save(@Valid CommunityDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
 
 		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
 		}
 
-		if (dto.getDistrict() == null) {
+		if (dtoToSave.getDistrict() == null) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.validDistrict));
 		}
 
-		Community community = service.getByUuid(dto.getUuid());
+		Community community = service.getByUuid(dtoToSave.getUuid());
 
 		if (community == null) {
-			List<CommunityReferenceDto> duplicates = getByName(dto.getName(), dto.getDistrict(), true);
+			List<CommunityReferenceDto> duplicates = getByName(dtoToSave.getName(), dtoToSave.getDistrict(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					String uuid = duplicates.get(0).getUuid();
 					community = service.getByUuid(uuid);
 					CommunityDto dtoToMerge = getByUuid(uuid);
-					dto = DtoHelper.copyDtoValues(dtoToMerge, dto, true);
+					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importCommunityAlreadyExists));
 				}
 			}
 		}
-		community = fillOrBuildEntity(dto, community, true);
-		service.ensurePersisted(community);
-		return toDto(community);
+		return persist(dtoToSave, community);
 	}
 
 	@Override
@@ -348,7 +347,7 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 		return dto;
 	}
 
-	private CommunityDto toDto(Community entity) {
+	public CommunityDto toDto(Community entity) {
 
 		if (entity == null) {
 			return null;
@@ -366,8 +365,7 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 		return dto;
 	}
 
-	private Community fillOrBuildEntity(@NotNull CommunityDto source, Community target, boolean checkChangeDate) {
-
+	protected void fillOrBuildEntity(@NotNull CommunityDto source, Community target, boolean checkChangeDate) {
 		target = DtoHelper.fillOrBuildEntity(source, target, Community::new, checkChangeDate);
 
 		target.setName(source.getName());
@@ -376,7 +374,6 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 		target.setArchived(source.isArchived());
 		target.setExternalID(source.getExternalID());
 
-		return target;
 	}
 
 	@LocalBean

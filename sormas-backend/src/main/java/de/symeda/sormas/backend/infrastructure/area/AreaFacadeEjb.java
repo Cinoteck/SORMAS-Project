@@ -110,25 +110,22 @@ public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, Area
 	}
 
 	@Override
-	public AreaDto save(@Valid AreaDto dto, boolean allowMerge) {
-		Area area = service.getByUuid(dto.getUuid());
+	public AreaDto save(@Valid AreaDto dtoToSave, boolean allowMerge) {
+		Area existingEntity = service.getByUuid(dtoToSave.getUuid());
 
-		if (area == null) {
-			List<Area> duplicates = service.getByName(dto.getName(), true);
+		if (existingEntity == null) {
+			List<Area> duplicates = service.getByName(dtoToSave.getName(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
-					area = duplicates.get(0);
-					AreaDto dtoToMerge = getByUuid(area.getUuid());
-					dto = DtoHelper.copyDtoValues(dtoToMerge, dto, true);
+					existingEntity = duplicates.get(0);
+					AreaDto dtoToMerge = getByUuid(existingEntity.getUuid());
+					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importAreaAlreadyExists));
 				}
 			}
 		}
-
-		area = fromDto(dto, area, true);
-		service.ensurePersisted(area);
-		return toDto(area);
+		return persist(dtoToSave, existingEntity);
 	}
 
 	@Override
@@ -156,14 +153,13 @@ public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, Area
 		return service.getAllUuids();
 	}
 
-	public Area fromDto(@NotNull AreaDto source, Area target, boolean checkChangeDate) {
+	public void fillOrBuildEntity(@NotNull AreaDto source, Area target, boolean checkChangeDate) {
 		target = DtoHelper.fillOrBuildEntity(source, target, Area::new, checkChangeDate);
 
 		target.setName(source.getName());
 		target.setExternalId(source.getExternalId());
 		target.setArchived(source.isArchived());
 
-		return target;
 	}
 
 	@Override

@@ -198,34 +198,32 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 	}
 
 	@Override
-	public CountryDto save(@Valid CountryDto dto, boolean allowMerge) throws ValidationRuntimeException {
+	public CountryDto save(@Valid CountryDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
 
 		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
 		}
-		if (StringUtils.isBlank(dto.getIsoCode())) {
+		if (StringUtils.isBlank(dtoToSave.getIsoCode())) {
 			throw new EmptyValueException(I18nProperties.getValidationError(Validations.importCountryEmptyIso));
 		}
 
-		Country country = service.getByUuid(dto.getUuid());
+		Country country = service.getByUuid(dtoToSave.getUuid());
 
 		if (country == null) {
-			Optional<Country> byIsoCode = service.getByIsoCode(dto.getIsoCode(), true);
-			Optional<Country> byUnoCode = service.getByUnoCode(dto.getUnoCode(), true);
+			Optional<Country> byIsoCode = service.getByIsoCode(dtoToSave.getIsoCode(), true);
+			Optional<Country> byUnoCode = service.getByUnoCode(dtoToSave.getUnoCode(), true);
 			if (byIsoCode.isPresent() || byUnoCode.isPresent()) {
 				if (allowMerge) {
 					country = byIsoCode.isPresent() ? byIsoCode.get() : byUnoCode.get();
 					CountryDto dtoToMerge = getCountryByUuid(country.getUuid());
-					dto = DtoHelper.copyDtoValues(dtoToMerge, dto, true);
+					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importCountryAlreadyExists));
 				}
 			}
 		}
 
-		country = fillOrBuildEntity(dto, country, true);
-		service.ensurePersisted(country);
-		return toDto(country);
+		return persist(dtoToSave, country);
 	}
 
 	public static CountryReferenceDto toReferenceDto(Country entity) {
@@ -295,7 +293,7 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 		return service.getByDefaultName(caption, includeArchived).stream().map(CountryFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
-	private Country fillOrBuildEntity(@NotNull CountryDto source, Country target, boolean checkChangeDate) {
+	protected void fillOrBuildEntity(@NotNull CountryDto source, Country target, boolean checkChangeDate) {
 		target = DtoHelper.fillOrBuildEntity(source, target, Country::new, checkChangeDate);
 
 		target.setDefaultName(source.getDefaultName());
@@ -308,7 +306,6 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 			target.setSubcontinent(subcontinentService.getByUuid(subcontinent.getUuid()));
 		}
 
-		return target;
 	}
 
 	@Override
