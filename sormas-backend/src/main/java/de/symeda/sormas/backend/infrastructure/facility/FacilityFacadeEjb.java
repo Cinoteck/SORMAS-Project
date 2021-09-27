@@ -597,14 +597,16 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 		Facility facility = service.getByUuid(dtoToSave.getUuid());
 
 		if (facility == null) {
-			List<FacilityReferenceDto> duplicates =
-				getByNameAndType(dtoToSave.getName(), dtoToSave.getDistrict(), dtoToSave.getCommunity(), dtoToSave.getType(), true);
+			List<Facility> duplicates = service.getFacilitiesByNameAndType(
+				dtoToSave.getName(),
+				districtService.getByReferenceDto(dtoToSave.getDistrict()),
+				communityService.getByReferenceDto(dtoToSave.getCommunity()),
+				dtoToSave.getType(),
+				true);
+
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
-					String uuid = duplicates.get(0).getUuid();
-					facility = service.getByUuid(uuid);
-					FacilityDto dtoToMerge = getByUuid(uuid);
-					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
+					mergeAndSave(dtoToSave, duplicates);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importFacilityAlreadyExists));
 				}

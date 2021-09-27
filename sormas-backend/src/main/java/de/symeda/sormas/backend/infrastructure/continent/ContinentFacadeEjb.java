@@ -202,9 +202,7 @@ public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, Con
 			List<Continent> duplicates = service.getByDefaultName(dtoToSave.getDefaultName(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
-					continent = duplicates.get(0);
-					ContinentDto dtoToMerge = getByUuid(continent.getUuid());
-					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
+					mergeAndSave(dtoToSave, duplicates);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importContinentAlreadyExists));
 				}

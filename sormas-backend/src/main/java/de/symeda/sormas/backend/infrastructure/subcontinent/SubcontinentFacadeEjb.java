@@ -230,13 +230,10 @@ public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinen
 		Subcontinent subcontinent = service.getByUuid(dtoToSave.getUuid());
 
 		if (subcontinent == null) {
-			List<SubcontinentReferenceDto> duplicates = getByDefaultName(dtoToSave.getDefaultName(), true);
+			List<Subcontinent> duplicates = service.getByDefaultName(dtoToSave.getDefaultName(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
-					String uuid = duplicates.get(0).getUuid();
-					subcontinent = service.getByUuid(uuid);
-					SubcontinentDto dtoToMerge = getByUuid(uuid);
-					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
+					mergeAndSave(dtoToSave, duplicates);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importSubcontinentAlreadyExists));
 				}

@@ -117,16 +117,16 @@ public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, Area
 			List<Area> duplicates = service.getByName(dtoToSave.getName(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
-					existingEntity = duplicates.get(0);
-					AreaDto dtoToMerge = getByUuid(existingEntity.getUuid());
-					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
+					return mergeAndSave(dtoToSave, duplicates);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importAreaAlreadyExists));
 				}
 			}
 		}
 		return persist(dtoToSave, existingEntity);
+
 	}
+
 
 	@Override
 	public boolean isUsedInOtherInfrastructureData(Collection<String> areaUuids) {

@@ -296,13 +296,10 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 		District district = service.getByUuid(dtoToSave.getUuid());
 
 		if (district == null) {
-			List<DistrictReferenceDto> duplicates = getByName(dtoToSave.getName(), dtoToSave.getRegion(), true);
+			List<District> duplicates = service.getByName(dtoToSave.getName(), regionService.getByReferenceDto(dtoToSave.getRegion()), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
-					String uuid = duplicates.get(0).getUuid();
-					district = service.getByUuid(uuid);
-					DistrictDto dtoToMerge = getDistrictByUuid(uuid);
-					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
+					mergeAndSave(dtoToSave, duplicates);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importDistrictAlreadyExists));
 				}

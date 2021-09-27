@@ -350,9 +350,7 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto
 			List<Region> duplicates = service.getByName(dtoToSave.getName(), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
-					region = duplicates.get(0);
-					RegionDto dtoToMerge = getByUuid(region.getUuid());
-					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
+					mergeAndSave(dtoToSave, duplicates);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importRegionAlreadyExists));
 				}

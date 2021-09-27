@@ -6,11 +6,14 @@ import de.symeda.sormas.api.infrastructure.continent.ContinentDto;
 import de.symeda.sormas.api.infrastructure.pointofentry.PointOfEntryDto;
 import de.symeda.sormas.backend.common.AbstractDomainObject;
 import de.symeda.sormas.backend.common.AdoServiceWithUserFilter;
+import de.symeda.sormas.backend.infrastructure.area.Area;
 import de.symeda.sormas.backend.infrastructure.continent.Continent;
 import de.symeda.sormas.backend.infrastructure.pointofentry.PointOfEntry;
+import de.symeda.sormas.backend.util.DtoHelper;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 // todo should we use BaseAdoService?
 public abstract class AbstractBaseEjb<ADO extends AbstractDomainObject, DTO extends EntityDto, SRV extends AdoServiceWithUserFilter<ADO>> {
@@ -41,6 +44,14 @@ public abstract class AbstractBaseEjb<ADO extends AbstractDomainObject, DTO exte
 		fillOrBuildEntity(dto, entityToPersist, true);
 		service.ensurePersisted(entityToPersist);
 		return toDto(entityToPersist);
+	}
+
+	protected DTO mergeAndSave(DTO dtoToSave, List<ADO> duplicates) {
+		ADO existingEntity = duplicates.get(0);
+		DTO existingDto = toDto(existingEntity);
+		DtoHelper.copyDtoValues(existingDto, dtoToSave, true);
+		return persist(dtoToSave, existingEntity);
+
 	}
 
 	protected abstract void fillOrBuildEntity(@NotNull DTO source, ADO target, boolean checkChangeDate);

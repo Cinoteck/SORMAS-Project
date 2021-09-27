@@ -62,4 +62,5 @@ public abstract class AbstractInfrastructureEjb<ADO extends InfrastructureAdo, D
 		}
 	}
 
+
 }

@@ -214,6 +214,7 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 			Optional<Country> byUnoCode = service.getByUnoCode(dtoToSave.getUnoCode(), true);
 			if (byIsoCode.isPresent() || byUnoCode.isPresent()) {
 				if (allowMerge) {
+					// todo no merging?
 					country = byIsoCode.isPresent() ? byIsoCode.get() : byUnoCode.get();
 					CountryDto dtoToMerge = getCountryByUuid(country.getUuid());
 					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);

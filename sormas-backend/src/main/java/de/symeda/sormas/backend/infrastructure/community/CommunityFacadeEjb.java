@@ -276,13 +276,10 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 		Community community = service.getByUuid(dtoToSave.getUuid());
 
 		if (community == null) {
-			List<CommunityReferenceDto> duplicates = getByName(dtoToSave.getName(), dtoToSave.getDistrict(), true);
+			List<Community> duplicates = service.getByName(dtoToSave.getName(), districtService.getByReferenceDto(dtoToSave.getDistrict()), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
-					String uuid = duplicates.get(0).getUuid();
-					community = service.getByUuid(uuid);
-					CommunityDto dtoToMerge = getByUuid(uuid);
-					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
+					return mergeAndSave(dtoToSave, duplicates);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importCommunityAlreadyExists));
 				}

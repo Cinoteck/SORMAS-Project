@@ -192,13 +192,10 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 		}
 
 		if (pointOfEntry == null) {
-			List<PointOfEntryReferenceDto> duplicates = getByName(dtoToSave.getName(), dtoToSave.getDistrict(), true);
+			List<PointOfEntry> duplicates = service.getByName(dtoToSave.getName(), districtService.getByReferenceDto(dtoToSave.getDistrict()), true);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
-					String uuid = duplicates.get(0).getUuid();
-					pointOfEntry = service.getByUuid(uuid);
-					PointOfEntryDto dtoToMerge = getByUuid(uuid);
-					dtoToSave = DtoHelper.copyDtoValues(dtoToMerge, dtoToSave, true);
+					mergeAndSave(dtoToSave, duplicates);
 				} else {
 					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importPointOfEntryAlreadyExists));
 				}
