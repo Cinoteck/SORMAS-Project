@@ -296,7 +296,7 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 		District district = service.getByUuid(dtoToSave.getUuid());
 
 		if (district == null) {
-			List<District> duplicates = service.getByName(dtoToSave.getName(), regionService.getByReferenceDto(dtoToSave.getRegion()), true);
+			List<District> duplicates = findDuplicates(dtoToSave);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					mergeAndSave(dtoToSave, duplicates);
@@ -307,6 +307,11 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 		}
 
 		return persist(dtoToSave, district);
+	}
+
+	@Override
+	protected List<District> findDuplicates(DistrictDto dto) {
+		return service.getByName(dto.getName(), regionService.getByReferenceDto(dto.getRegion()), true);
 	}
 
 	@Override

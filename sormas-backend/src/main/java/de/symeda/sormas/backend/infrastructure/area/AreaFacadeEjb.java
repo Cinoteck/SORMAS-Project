@@ -114,7 +114,7 @@ public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, Area
 		Area existingEntity = service.getByUuid(dtoToSave.getUuid());
 
 		if (existingEntity == null) {
-			List<Area> duplicates = service.getByName(dtoToSave.getName(), true);
+			List<Area> duplicates = findDuplicates(dtoToSave);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					return mergeAndSave(dtoToSave, duplicates);
@@ -127,6 +127,10 @@ public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, Area
 
 	}
 
+	@Override
+	protected List<Area> findDuplicates(AreaDto dto) {
+		return service.getByName(dto.getName(), true);
+	}
 
 	@Override
 	public boolean isUsedInOtherInfrastructureData(Collection<String> areaUuids) {

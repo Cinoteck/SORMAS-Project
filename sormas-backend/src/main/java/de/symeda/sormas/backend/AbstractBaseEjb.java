@@ -54,6 +54,8 @@ public abstract class AbstractBaseEjb<ADO extends AbstractDomainObject, DTO exte
 
 	}
 
+	protected abstract List<ADO> findDuplicates(DTO dto);
+
 	protected abstract void fillOrBuildEntity(@NotNull DTO source, ADO target, boolean checkChangeDate);
 
 	public abstract DTO toDto(ADO ado);

@@ -230,7 +230,7 @@ public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinen
 		Subcontinent subcontinent = service.getByUuid(dtoToSave.getUuid());
 
 		if (subcontinent == null) {
-			List<Subcontinent> duplicates = service.getByDefaultName(dtoToSave.getDefaultName(), true);
+			List<Subcontinent> duplicates = findDuplicates(dtoToSave);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					mergeAndSave(dtoToSave, duplicates);
@@ -241,6 +241,11 @@ public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinen
 		}
 
 		return persist(dtoToSave, subcontinent);
+	}
+
+	@Override
+	protected List<Subcontinent> findDuplicates(SubcontinentDto dto) {
+		return service.getByDefaultName(dto.getDefaultName(), true);
 	}
 
 	@Override

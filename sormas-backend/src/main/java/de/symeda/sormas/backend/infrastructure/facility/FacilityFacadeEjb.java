@@ -597,12 +597,7 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 		Facility facility = service.getByUuid(dtoToSave.getUuid());
 
 		if (facility == null) {
-			List<Facility> duplicates = service.getFacilitiesByNameAndType(
-				dtoToSave.getName(),
-				districtService.getByReferenceDto(dtoToSave.getDistrict()),
-				communityService.getByReferenceDto(dtoToSave.getCommunity()),
-				dtoToSave.getType(),
-				true);
+			List<Facility> duplicates = findDuplicates(dtoToSave);
 
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
@@ -614,6 +609,16 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 		}
 
 		return persist(dtoToSave, facility);
+	}
+
+	@Override
+	protected List<Facility> findDuplicates(FacilityDto dto) {
+		return service.getFacilitiesByNameAndType(
+			dto.getName(),
+			districtService.getByReferenceDto(dto.getDistrict()),
+			communityService.getByReferenceDto(dto.getCommunity()),
+			dto.getType(),
+			true);
 	}
 
 	@Override

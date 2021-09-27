@@ -199,7 +199,7 @@ public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, Con
 		Continent continent = service.getByUuid(dtoToSave.getUuid());
 
 		if (continent == null) {
-			List<Continent> duplicates = service.getByDefaultName(dtoToSave.getDefaultName(), true);
+			List<Continent> duplicates = findDuplicates(dtoToSave);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					mergeAndSave(dtoToSave, duplicates);
@@ -210,6 +210,11 @@ public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, Con
 		}
 
 		return persist(dtoToSave, continent);
+	}
+
+	@Override
+	protected List<Continent> findDuplicates(ContinentDto dto) {
+		return service.getByDefaultName(dto.getDefaultName(), true);
 	}
 
 	@Override

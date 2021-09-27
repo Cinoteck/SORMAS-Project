@@ -227,6 +227,11 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 		return persist(dtoToSave, country);
 	}
 
+	@Override
+	protected List<Country> findDuplicates(CountryDto dto) {
+		return null;
+	}
+
 	public static CountryReferenceDto toReferenceDto(Country entity) {
 		if (entity == null) {
 			return null;

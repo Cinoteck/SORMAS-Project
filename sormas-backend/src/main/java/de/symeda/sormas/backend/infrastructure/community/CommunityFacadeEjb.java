@@ -276,7 +276,7 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 		Community community = service.getByUuid(dtoToSave.getUuid());
 
 		if (community == null) {
-			List<Community> duplicates = service.getByName(dtoToSave.getName(), districtService.getByReferenceDto(dtoToSave.getDistrict()), true);
+			List<Community> duplicates = findDuplicates(dtoToSave);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					return mergeAndSave(dtoToSave, duplicates);
@@ -286,6 +286,11 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 			}
 		}
 		return persist(dtoToSave, community);
+	}
+
+	@Override
+	protected List<Community> findDuplicates(CommunityDto dto) {
+		return service.getByName(dto.getName(), districtService.getByReferenceDto(dto.getDistrict()), true);
 	}
 
 	@Override

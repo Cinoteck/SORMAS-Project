@@ -347,7 +347,7 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto
 		Region region = service.getByUuid(dtoToSave.getUuid());
 
 		if (region == null) {
-			List<Region> duplicates = service.getByName(dtoToSave.getName(), true);
+			List<Region> duplicates = findDuplicates(dtoToSave);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					mergeAndSave(dtoToSave, duplicates);
@@ -358,6 +358,11 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto
 		}
 
 		return persist(dtoToSave, region);
+	}
+
+	@Override
+	protected List<Region> findDuplicates(RegionDto dto) {
+		return service.getByName(dto.getName(), true);
 	}
 
 	@Override

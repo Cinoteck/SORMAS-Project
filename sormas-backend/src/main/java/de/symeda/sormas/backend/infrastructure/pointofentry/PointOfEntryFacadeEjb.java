@@ -192,7 +192,7 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 		}
 
 		if (pointOfEntry == null) {
-			List<PointOfEntry> duplicates = service.getByName(dtoToSave.getName(), districtService.getByReferenceDto(dtoToSave.getDistrict()), true);
+			List<PointOfEntry> duplicates = findDuplicates(dtoToSave);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					mergeAndSave(dtoToSave, duplicates);
@@ -203,6 +203,11 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 		}
 
 		return persist(dtoToSave, pointOfEntry);
+	}
+
+	@Override
+	protected List<PointOfEntry> findDuplicates(PointOfEntryDto dto) {
+		return service.getByName(dto.getName(), districtService.getByReferenceDto(dto.getDistrict()), true);
 	}
 
 	@Override
