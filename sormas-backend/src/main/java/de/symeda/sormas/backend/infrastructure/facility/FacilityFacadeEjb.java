@@ -78,7 +78,7 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "FacilityFacade")
-public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, FacilityDto, FacilityService> implements FacilityFacade {
+public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, FacilityDto, FacilityService, FacilityCriteria> implements FacilityFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;

@@ -61,7 +61,8 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "ContinentFacade")
-public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, ContinentDto, ContinentService> implements ContinentFacade {
+public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, ContinentDto, ContinentService, ContinentCriteria>
+	implements ContinentFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;

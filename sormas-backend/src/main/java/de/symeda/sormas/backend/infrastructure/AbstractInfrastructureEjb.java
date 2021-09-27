@@ -5,6 +5,7 @@ import de.symeda.sormas.api.feature.FeatureType;
 import de.symeda.sormas.api.i18n.I18nProperties;
 import de.symeda.sormas.api.i18n.Validations;
 import de.symeda.sormas.api.utils.ValidationRuntimeException;
+import de.symeda.sormas.api.utils.criteria.BaseCriteria;
 import de.symeda.sormas.backend.AbstractBaseEjb;
 import de.symeda.sormas.backend.common.AbstractInfrastructureAdoService;
 import de.symeda.sormas.backend.common.InfrastructureAdo;
@@ -12,8 +13,8 @@ import de.symeda.sormas.backend.feature.FeatureConfigurationFacadeEjb;
 
 import java.util.List;
 
-public abstract class AbstractInfrastructureEjb<ADO extends InfrastructureAdo, DTO extends EntityDto, SRV extends AbstractInfrastructureAdoService<ADO>>
-	extends AbstractBaseEjb<ADO, DTO, SRV> {
+public abstract class AbstractInfrastructureEjb<A extends InfrastructureAdo, D extends EntityDto, S extends AbstractInfrastructureAdoService<A, C>, C extends BaseCriteria>
+	extends AbstractBaseEjb<A, D, S> {
 
 	protected FeatureConfigurationFacadeEjb featureConfiguration;
 
@@ -21,19 +22,19 @@ public abstract class AbstractInfrastructureEjb<ADO extends InfrastructureAdo, D
 		super();
 	}
 
-	protected AbstractInfrastructureEjb(SRV service, FeatureConfigurationFacadeEjb featureConfiguration) {
+	protected AbstractInfrastructureEjb(S service, FeatureConfigurationFacadeEjb featureConfiguration) {
 		super(service);
 		this.featureConfiguration = featureConfiguration;
 	}
 
-	protected DTO save(DTO dtoToSave, boolean allowMerge, String duplicateErrorMessage) {
+	protected D save(D dtoToSave, boolean allowMerge, String duplicateErrorMessage) {
 		if (dtoToSave == null) {
 			return null;
 		}
-		ADO existingEntity = service.getByUuid(dtoToSave.getUuid());
+		A existingEntity = service.getByUuid(dtoToSave.getUuid());
 
 		if (existingEntity == null) {
-			List<ADO> duplicates = findDuplicates(dtoToSave);
+			List<A> duplicates = findDuplicates(dtoToSave);
 			if (!duplicates.isEmpty()) {
 				if (allowMerge) {
 					return mergeAndSave(dtoToSave, duplicates);
@@ -49,7 +50,7 @@ public abstract class AbstractInfrastructureEjb<ADO extends InfrastructureAdo, D
 	public void archive(String uuid) {
 		// todo this should be really in the parent but right now there the setter for archived is not available there
 		checkInfraDataLocked();
-		ADO ado = service.getByUuid(uuid);
+		A ado = service.getByUuid(uuid);
 		if (ado != null) {
 			ado.setArchived(true);
 			service.ensurePersisted(ado);
@@ -66,7 +67,7 @@ public abstract class AbstractInfrastructureEjb<ADO extends InfrastructureAdo, D
 	}
 
 	private void doDearchive(String uuid) {
-		ADO ado = service.getByUuid(uuid);
+		A ado = service.getByUuid(uuid);
 		if (ado != null) {
 			ado.setArchived(false);
 			service.ensurePersisted(ado);

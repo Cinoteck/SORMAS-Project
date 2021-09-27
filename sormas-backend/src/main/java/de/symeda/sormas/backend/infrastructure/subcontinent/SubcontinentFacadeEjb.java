@@ -61,7 +61,7 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "SubcontinentFacade")
-public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinent, SubcontinentDto, SubcontinentService>
+public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinent, SubcontinentDto, SubcontinentService, SubcontinentCriteria>
 	implements SubcontinentFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)

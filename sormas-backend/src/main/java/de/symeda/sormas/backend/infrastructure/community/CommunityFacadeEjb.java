@@ -66,7 +66,8 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "CommunityFacade")
-public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, CommunityDto, CommunityService> implements CommunityFacade {
+public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, CommunityDto, CommunityService, CommunityCriteria>
+	implements CommunityFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;

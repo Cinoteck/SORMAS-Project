@@ -36,7 +36,7 @@ import de.symeda.sormas.backend.util.ModelConstants;
 import de.symeda.sormas.backend.util.QueryHelper;
 
 @Stateless(name = "AreaFacade")
-public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, AreaService> implements AreaFacade {
+public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, AreaService, AreaCriteria> implements AreaFacade {
 
 	@PersistenceContext(unitName = ModelConstants.PERSISTENCE_UNIT_NAME)
 	private EntityManager em;

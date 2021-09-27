@@ -11,42 +11,42 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import de.symeda.sormas.api.EntityRelevanceStatus;
-import de.symeda.sormas.backend.infrastructure.area.Area;
+import de.symeda.sormas.api.utils.criteria.BaseCriteria;
 import de.symeda.sormas.backend.util.QueryHelper;
 
-public abstract class AbstractInfrastructureAdoService<ADO extends InfrastructureAdo> extends AdoServiceWithUserFilter<ADO> {
+public abstract class AbstractInfrastructureAdoService<A extends InfrastructureAdo, C extends BaseCriteria> extends AdoServiceWithUserFilter<A> {
 
-	public AbstractInfrastructureAdoService(Class<ADO> elementClass) {
+	public AbstractInfrastructureAdoService(Class<A> elementClass) {
 		super(elementClass);
 	}
 
-	public void archive(ADO archiveme) {
+	public void archive(A archiveme) {
 
 		archiveme.setArchived(true);
 		em.persist(archiveme);
 		em.flush();
 	}
 
-	public Predicate createBasicFilter(CriteriaBuilder cb, Root<ADO> root) {
+	public Predicate createBasicFilter(CriteriaBuilder cb, Root<A> root) {
 		return cb.isFalse(root.get(InfrastructureAdo.ARCHIVED));
 	}
 
-	public List<ADO> getAllActive() {
+	public List<A> getAllActive() {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<ADO> cq = cb.createQuery(getElementClass());
-		Root<ADO> from = cq.from(getElementClass());
+		CriteriaQuery<A> cq = cb.createQuery(getElementClass());
+		Root<A> from = cq.from(getElementClass());
 		cq.where(createBasicFilter(cb, from));
 		cq.orderBy(cb.desc(from.get(AbstractDomainObject.CHANGE_DATE)));
 
 		return em.createQuery(cq).getResultList();
 	}
 
-	public List<ADO> getAllActive(String orderProperty, boolean asc) {
+	public List<A> getAllActive(String orderProperty, boolean asc) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<ADO> cq = cb.createQuery(getElementClass());
-		Root<ADO> from = cq.from(getElementClass());
+		CriteriaQuery<A> cq = cb.createQuery(getElementClass());
+		Root<A> from = cq.from(getElementClass());
 		cq.where(createBasicFilter(cb, from));
 		cq.orderBy(asc ? cb.asc(from.get(orderProperty)) : cb.desc(from.get(orderProperty)));
 
@@ -68,7 +68,7 @@ public abstract class AbstractInfrastructureAdoService<ADO extends Infrastructur
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<T> cq = cb.createQuery(targetElementClass);
 		Root<T> root = cq.from(targetElementClass);
-		Join<T, ADO> join = root.join(adoAttribute);
+		Join<T, A> join = root.join(adoAttribute);
 
 		cq.where(
 			cb.and(
@@ -93,10 +93,10 @@ public abstract class AbstractInfrastructureAdoService<ADO extends Infrastructur
 	}
 
 	// todo remove columnName later and handle this completely here. This is not possible due to #6549 now.
-	protected List<ADO> getByExternalId(String externalId, String columnName, boolean includeArchived) {
+	protected List<A> getByExternalId(String externalId, String columnName, boolean includeArchived) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
-		CriteriaQuery<ADO> cq = cb.createQuery(getElementClass());
-		Root<ADO> from = cq.from(getElementClass());
+		CriteriaQuery<A> cq = cb.createQuery(getElementClass());
+		Root<A> from = cq.from(getElementClass());
 
 		Predicate filter = CriteriaBuilderHelper.ilikePrecise(cb, from.get(columnName), externalId.trim());
 		if (!includeArchived) {
@@ -109,7 +109,6 @@ public abstract class AbstractInfrastructureAdoService<ADO extends Infrastructur
 
 	}
 
-	public abstract List<ADO> getByExternalId(String externalId, boolean includeArchived);
-
+	public abstract List<A> getByExternalId(String externalId, boolean includeArchived);
 
 }
