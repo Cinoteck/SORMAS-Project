@@ -149,11 +149,6 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 	}
 
 	@Override
-	public DistrictDto getByUuid(String uuid) {
-		return toDto(service.getByUuid(uuid));
-	}
-
-	@Override
 	public List<DistrictIndexDto> getIndexList(DistrictCriteria criteria, Integer first, Integer max, List<SortProperty> sortProperties) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();

@@ -123,11 +123,6 @@ public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, Con
 	}
 
 	@Override
-	public ContinentDto getByUuid(String uuid) {
-		return toDto(service.getByUuid(uuid));
-	}
-
-	@Override
 	public List<ContinentIndexDto> getIndexList(ContinentCriteria criteria, Integer first, Integer max, List<SortProperty> sortProperties) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Continent> cq = cb.createQuery(Continent.class);

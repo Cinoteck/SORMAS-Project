@@ -55,11 +55,6 @@ public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, Area
 	}
 
 	@Override
-	public AreaDto getByUuid(String uuid) {
-		return toDto(service.getByUuid(uuid));
-	}
-
-	@Override
 	public List<AreaDto> getIndexList(AreaCriteria criteria, Integer first, Integer max, List<SortProperty> sortProperties) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Area> cq = cb.createQuery(Area.class);

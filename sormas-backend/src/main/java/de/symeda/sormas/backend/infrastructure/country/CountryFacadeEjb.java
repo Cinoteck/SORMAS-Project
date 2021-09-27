@@ -331,11 +331,6 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 	}
 
 	@Override
-	public CountryDto getByUuid(String uuid) {
-		return toDto(service.getByUuid(uuid));
-	}
-
-	@Override
 	public List<CountryDto> getByUuids(List<String> uuids) {
 		return service.getByUuids(uuids).stream().map(this::toDto).collect(Collectors.toList());
 	}

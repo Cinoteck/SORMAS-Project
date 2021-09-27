@@ -97,11 +97,6 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 	}
 
 	@Override
-	public PointOfEntryDto getByUuid(String uuid) {
-		return toDto(service.getByUuid(uuid));
-	}
-
-	@Override
 	public List<PointOfEntryDto> getAllAfter(Date date) {
 
 		CriteriaBuilder cb = em.getCriteriaBuilder();

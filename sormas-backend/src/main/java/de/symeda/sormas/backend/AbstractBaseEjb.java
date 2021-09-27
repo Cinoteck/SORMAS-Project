@@ -54,6 +54,10 @@ public abstract class AbstractBaseEjb<ADO extends AbstractDomainObject, DTO exte
 
 	}
 
+	public DTO getByUuid(String uuid) {
+		return toDto(service.getByUuid(uuid));
+	}
+
 	protected abstract List<ADO> findDuplicates(DTO dto);
 
 	protected abstract void fillOrBuildEntity(@NotNull DTO source, ADO target, boolean checkChangeDate);

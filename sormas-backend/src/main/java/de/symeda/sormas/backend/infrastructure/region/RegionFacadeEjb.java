@@ -251,11 +251,6 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto
 	}
 
 	@Override
-	public RegionDto getByUuid(String uuid) {
-		return toDto(service.getByUuid(uuid));
-	}
-
-	@Override
 	public List<RegionDto> getByUuids(List<String> uuids) {
 		return service.getByUuids(uuids).stream().map(this::toDto).collect(Collectors.toList());
 	}

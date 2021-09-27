@@ -224,11 +224,6 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 	}
 
 	@Override
-	public CommunityDto getByUuid(String uuid) {
-		return toDto(service.getByUuid(uuid));
-	}
-
-	@Override
 	public List<CommunityDto> getByUuids(List<String> uuids) {
 		return service.getByUuids(uuids).stream().map(this::toDto).collect(Collectors.toList());
 	}

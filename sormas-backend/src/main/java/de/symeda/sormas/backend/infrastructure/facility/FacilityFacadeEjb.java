@@ -266,11 +266,6 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 	}
 
 	@Override
-	public FacilityDto getByUuid(String uuid) {
-		return toDto(service.getByUuid(uuid));
-	}
-
-	@Override
 	public List<FacilityDto> getByUuids(List<String> uuids) {
 		return service.getByUuids(uuids).stream().map(c -> toDto(c)).collect(Collectors.toList());
 	}

@@ -138,11 +138,6 @@ public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinen
 	}
 
 	@Override
-	public SubcontinentDto getByUuid(String uuid) {
-		return toDto(service.getByUuid(uuid));
-	}
-
-	@Override
 	public List<SubcontinentIndexDto> getIndexList(SubcontinentCriteria criteria, Integer first, Integer max, List<SortProperty> sortProperties) {
 		CriteriaBuilder cb = em.getCriteriaBuilder();
 		CriteriaQuery<Subcontinent> cq = cb.createQuery(Subcontinent.class);
