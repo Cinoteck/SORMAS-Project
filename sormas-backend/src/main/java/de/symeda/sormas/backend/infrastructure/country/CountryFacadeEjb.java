@@ -298,7 +298,7 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 		return service.getByDefaultName(caption, includeArchived).stream().map(CountryFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
-	protected void fillOrBuildEntity(@NotNull CountryDto source, Country target, boolean checkChangeDate) {
+	protected Country fillOrBuildEntity(@NotNull CountryDto source, Country target, boolean checkChangeDate) {
 		target = DtoHelper.fillOrBuildEntity(source, target, Country::new, checkChangeDate);
 
 		target.setDefaultName(source.getDefaultName());
@@ -310,7 +310,7 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 		if (subcontinent != null) {
 			target.setSubcontinent(subcontinentService.getByUuid(subcontinent.getUuid()));
 		}
-
+		return target;
 	}
 
 	@Override

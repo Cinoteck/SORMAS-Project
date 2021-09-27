@@ -397,7 +397,7 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 		return dto;
 	}
 
-	protected void fillOrBuildEntity(@NotNull DistrictDto source, District target, boolean checkChangeDate) {
+	protected District fillOrBuildEntity(@NotNull DistrictDto source, District target, boolean checkChangeDate) {
 
 		target = DtoHelper.fillOrBuildEntity(source, target, District::new, checkChangeDate);
 
@@ -407,7 +407,7 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 		target.setRegion(regionService.getByReferenceDto(source.getRegion()));
 		target.setArchived(source.isArchived());
 		target.setExternalID(source.getExternalID());
-
+		return target;
 	}
 
 	@Override

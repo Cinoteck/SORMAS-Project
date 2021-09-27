@@ -324,7 +324,7 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 		return QueryHelper.getFirstResult(em, cq) != null;
 	}
 
-	protected void fillOrBuildEntity(@NotNull PointOfEntryDto source, PointOfEntry target, boolean checkChangeDate) {
+	protected PointOfEntry fillOrBuildEntity(@NotNull PointOfEntryDto source, PointOfEntry target, boolean checkChangeDate) {
 
 		target = DtoHelper.fillOrBuildEntity(source, target, PointOfEntry::new, checkChangeDate);
 
@@ -337,6 +337,7 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 		target.setDistrict(districtService.getByReferenceDto(source.getDistrict()));
 		target.setArchived(source.isArchived());
 		target.setExternalID(source.getExternalID());
+		return target;
 	}
 
 	public PointOfEntryDto toDto(PointOfEntry entity) {

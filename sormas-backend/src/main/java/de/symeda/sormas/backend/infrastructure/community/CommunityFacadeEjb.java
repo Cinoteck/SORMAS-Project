@@ -353,7 +353,7 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 	}
 
 	@Override
-	protected void fillOrBuildEntity(@NotNull CommunityDto source, Community target, boolean checkChangeDate) {
+	protected Community fillOrBuildEntity(@NotNull CommunityDto source, Community target, boolean checkChangeDate) {
 		target = DtoHelper.fillOrBuildEntity(source, target, Community::new, checkChangeDate);
 
 		target.setName(source.getName());
@@ -361,7 +361,7 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 		target.setDistrict(districtService.getByReferenceDto(source.getDistrict()));
 		target.setArchived(source.isArchived());
 		target.setExternalID(source.getExternalID());
-
+		return target;
 	}
 
 	@LocalBean

@@ -139,13 +139,13 @@ public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, Area
 		return service.getAllUuids();
 	}
 
-	public void fillOrBuildEntity(@NotNull AreaDto source, Area target, boolean checkChangeDate) {
+	public Area fillOrBuildEntity(@NotNull AreaDto source, Area target, boolean checkChangeDate) {
 		target = DtoHelper.fillOrBuildEntity(source, target, Area::new, checkChangeDate);
 
 		target.setName(source.getName());
 		target.setExternalId(source.getExternalId());
 		target.setArchived(source.isArchived());
-
+		return target;
 	}
 
 	@Override

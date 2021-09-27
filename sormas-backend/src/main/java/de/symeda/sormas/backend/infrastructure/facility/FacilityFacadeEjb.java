@@ -622,7 +622,7 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 		}
 	}
 
-	protected void fillOrBuildEntity(@NotNull FacilityDto source, Facility target, boolean checkChangeDate) {
+	protected Facility fillOrBuildEntity(@NotNull FacilityDto source, Facility target, boolean checkChangeDate) {
 
 		target = DtoHelper.fillOrBuildEntity(source, target, Facility::new, checkChangeDate);
 
@@ -648,6 +648,7 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 		target.setType(source.getType());
 		target.setArchived(source.isArchived());
 		target.setExternalID(source.getExternalID());
+		return target;
 	}
 
 	@LocalBean

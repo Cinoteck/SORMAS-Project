@@ -373,7 +373,7 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto
 		return em.createQuery(cq).getResultList().stream().map(RegionFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
-	protected void fillOrBuildEntity(@NotNull RegionDto source, Region target, boolean checkChangeDate) {
+	protected Region fillOrBuildEntity(@NotNull RegionDto source, Region target, boolean checkChangeDate) {
 
 		target = DtoHelper.fillOrBuildEntity(source, target, Region::new, checkChangeDate);
 
@@ -385,6 +385,7 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto
 		target.setArea(areaService.getByReferenceDto(source.getArea()));
 		target.setCountry(countryService.getByReferenceDto(source.getCountry()));
 
+		return target;
 	}
 
 	@LocalBean

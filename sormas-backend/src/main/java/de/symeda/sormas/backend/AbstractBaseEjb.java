@@ -41,7 +41,7 @@ public abstract class AbstractBaseEjb<ADO extends AbstractDomainObject, DTO exte
 
 	// todo private
 	protected DTO persist(DTO dto, ADO entityToPersist) {
-		fillOrBuildEntity(dto, entityToPersist, true);
+		entityToPersist = fillOrBuildEntity(dto, entityToPersist, true);
 		service.ensurePersisted(entityToPersist);
 		return toDto(entityToPersist);
 	}
@@ -60,7 +60,7 @@ public abstract class AbstractBaseEjb<ADO extends AbstractDomainObject, DTO exte
 
 	protected abstract List<ADO> findDuplicates(DTO dto);
 
-	protected abstract void fillOrBuildEntity(@NotNull DTO source, ADO target, boolean checkChangeDate);
+	protected abstract ADO fillOrBuildEntity(@NotNull DTO source, ADO target, boolean checkChangeDate);
 
 	public abstract DTO toDto(ADO ado);
 }
