@@ -284,29 +284,11 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 
 	@Override
 	public DistrictDto save(@Valid DistrictDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
-
-		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
-			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
-		}
-
+		checkInfraDataLocked();
 		if (dtoToSave.getRegion() == null) {
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.validRegion));
 		}
-
-		District district = service.getByUuid(dtoToSave.getUuid());
-
-		if (district == null) {
-			List<District> duplicates = findDuplicates(dtoToSave);
-			if (!duplicates.isEmpty()) {
-				if (allowMerge) {
-					mergeAndSave(dtoToSave, duplicates);
-				} else {
-					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importDistrictAlreadyExists));
-				}
-			}
-		}
-
-		return persist(dtoToSave, district);
+		return save(dtoToSave, allowMerge, Validations.importDistrictAlreadyExists);
 	}
 
 	@Override
@@ -379,8 +361,7 @@ public class DistrictFacadeEjb extends AbstractInfrastructureEjb<District, Distr
 			return null;
 		}
 
-		DistrictReferenceDto dto = new DistrictReferenceDto(entity.getUuid(), entity.toString(), entity.getExternalID());
-		return dto;
+		return new DistrictReferenceDto(entity.getUuid(), entity.toString(), entity.getExternalID());
 	}
 
 	public DistrictDto toDto(District entity) {

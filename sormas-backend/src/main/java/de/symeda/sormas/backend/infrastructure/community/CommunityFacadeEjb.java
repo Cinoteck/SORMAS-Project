@@ -273,19 +273,7 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.validDistrict));
 		}
 
-		Community community = service.getByUuid(dtoToSave.getUuid());
-
-		if (community == null) {
-			List<Community> duplicates = findDuplicates(dtoToSave);
-			if (!duplicates.isEmpty()) {
-				if (allowMerge) {
-					return mergeAndSave(dtoToSave, duplicates);
-				} else {
-					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importCommunityAlreadyExists));
-				}
-			}
-		}
-		return persist(dtoToSave, community);
+		return save(dtoToSave, allowMerge, Validations.importCommunityAlreadyExists);
 	}
 
 	@Override

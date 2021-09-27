@@ -40,7 +40,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import de.symeda.sormas.api.common.Page;
-import de.symeda.sormas.api.feature.FeatureType;
 import de.symeda.sormas.api.i18n.I18nProperties;
 import de.symeda.sormas.api.i18n.Validations;
 import de.symeda.sormas.api.infrastructure.country.CountryReferenceDto;
@@ -50,7 +49,6 @@ import de.symeda.sormas.api.infrastructure.subcontinent.SubcontinentFacade;
 import de.symeda.sormas.api.infrastructure.subcontinent.SubcontinentIndexDto;
 import de.symeda.sormas.api.infrastructure.subcontinent.SubcontinentReferenceDto;
 import de.symeda.sormas.api.utils.SortProperty;
-import de.symeda.sormas.api.utils.ValidationRuntimeException;
 import de.symeda.sormas.backend.feature.FeatureConfigurationFacadeEjb.FeatureConfigurationFacadeEjbLocal;
 import de.symeda.sormas.backend.infrastructure.AbstractInfrastructureEjb;
 import de.symeda.sormas.backend.infrastructure.continent.Continent;
@@ -222,25 +220,8 @@ public class SubcontinentFacadeEjb extends AbstractInfrastructureEjb<Subcontinen
 
 	@Override
 	public SubcontinentDto save(@Valid SubcontinentDto dtoToSave, boolean allowMerge) {
-
-		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
-			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
-		}
-
-		Subcontinent subcontinent = service.getByUuid(dtoToSave.getUuid());
-
-		if (subcontinent == null) {
-			List<Subcontinent> duplicates = findDuplicates(dtoToSave);
-			if (!duplicates.isEmpty()) {
-				if (allowMerge) {
-					mergeAndSave(dtoToSave, duplicates);
-				} else {
-					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importSubcontinentAlreadyExists));
-				}
-			}
-		}
-
-		return persist(dtoToSave, subcontinent);
+		checkInfraDataLocked();
+		return save(dtoToSave, allowMerge, Validations.importSubcontinentAlreadyExists);
 	}
 
 	@Override

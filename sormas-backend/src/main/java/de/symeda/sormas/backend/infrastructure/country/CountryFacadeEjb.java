@@ -199,10 +199,7 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 
 	@Override
 	public CountryDto save(@Valid CountryDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
-
-		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
-			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
-		}
+		checkInfraDataLocked();
 		if (StringUtils.isBlank(dtoToSave.getIsoCode())) {
 			throw new EmptyValueException(I18nProperties.getValidationError(Validations.importCountryEmptyIso));
 		}

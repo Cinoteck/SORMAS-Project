@@ -339,25 +339,8 @@ public class RegionFacadeEjb extends AbstractInfrastructureEjb<Region, RegionDto
 
 	@Override
 	public RegionDto save(@Valid RegionDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
-
-		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
-			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
-		}
-
-		Region region = service.getByUuid(dtoToSave.getUuid());
-
-		if (region == null) {
-			List<Region> duplicates = findDuplicates(dtoToSave);
-			if (!duplicates.isEmpty()) {
-				if (allowMerge) {
-					mergeAndSave(dtoToSave, duplicates);
-				} else {
-					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importRegionAlreadyExists));
-				}
-			}
-		}
-
-		return persist(dtoToSave, region);
+		checkInfraDataLocked();
+		return save(dtoToSave, allowMerge, Validations.importRegionAlreadyExists);
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import de.symeda.sormas.backend.common.AbstractInfrastructureAdoService;
 import de.symeda.sormas.backend.common.InfrastructureAdo;
 import de.symeda.sormas.backend.feature.FeatureConfigurationFacadeEjb;
 
+import java.util.List;
 
 public abstract class AbstractInfrastructureEjb<ADO extends InfrastructureAdo, DTO extends EntityDto, SRV extends AbstractInfrastructureAdoService<ADO>>
 	extends AbstractBaseEjb<ADO, DTO, SRV> {
@@ -23,6 +24,25 @@ public abstract class AbstractInfrastructureEjb<ADO extends InfrastructureAdo, D
 	protected AbstractInfrastructureEjb(SRV service, FeatureConfigurationFacadeEjb featureConfiguration) {
 		super(service);
 		this.featureConfiguration = featureConfiguration;
+	}
+
+	protected DTO save(DTO dtoToSave, boolean allowMerge, String duplicateErrorMessage) {
+		if (dtoToSave == null) {
+			return null;
+		}
+		ADO existingEntity = service.getByUuid(dtoToSave.getUuid());
+
+		if (existingEntity == null) {
+			List<ADO> duplicates = findDuplicates(dtoToSave);
+			if (!duplicates.isEmpty()) {
+				if (allowMerge) {
+					return mergeAndSave(dtoToSave, duplicates);
+				} else {
+					throw new ValidationRuntimeException(I18nProperties.getValidationError(duplicateErrorMessage));
+				}
+			}
+		}
+		return persist(dtoToSave, existingEntity);
 	}
 
 	@Override
@@ -45,12 +65,6 @@ public abstract class AbstractInfrastructureEjb<ADO extends InfrastructureAdo, D
 		doDearchive(uuid);
 	}
 
-	private void checkInfraDataLocked() {
-		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
-			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
-		}
-	}
-
 	private void doDearchive(String uuid) {
 		ADO ado = service.getByUuid(uuid);
 		if (ado != null) {
@@ -59,5 +73,10 @@ public abstract class AbstractInfrastructureEjb<ADO extends InfrastructureAdo, D
 		}
 	}
 
+	protected void checkInfraDataLocked() {
+		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
+			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
+		}
+	}
 
 }

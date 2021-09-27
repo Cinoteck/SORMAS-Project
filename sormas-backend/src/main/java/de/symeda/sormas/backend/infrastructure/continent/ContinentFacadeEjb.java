@@ -191,25 +191,8 @@ public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, Con
 
 	@Override
 	public ContinentDto save(@Valid ContinentDto dtoToSave, boolean allowMerge) {
-
-		if (!featureConfiguration.isFeatureEnabled(FeatureType.EDIT_INFRASTRUCTURE_DATA)) {
-			throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.infrastructureDataLocked));
-		}
-
-		Continent continent = service.getByUuid(dtoToSave.getUuid());
-
-		if (continent == null) {
-			List<Continent> duplicates = findDuplicates(dtoToSave);
-			if (!duplicates.isEmpty()) {
-				if (allowMerge) {
-					mergeAndSave(dtoToSave, duplicates);
-				} else {
-					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importContinentAlreadyExists));
-				}
-			}
-		}
-
-		return persist(dtoToSave, continent);
+		checkInfraDataLocked();
+		return save(dtoToSave, allowMerge, Validations.importContinentAlreadyExists);
 	}
 
 	@Override

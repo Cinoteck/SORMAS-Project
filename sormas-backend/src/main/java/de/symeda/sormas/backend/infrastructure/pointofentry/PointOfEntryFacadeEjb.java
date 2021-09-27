@@ -183,26 +183,8 @@ public class PointOfEntryFacadeEjb extends AbstractInfrastructureEjb<PointOfEntr
 
 	@Override
 	public PointOfEntryDto save(@Valid PointOfEntryDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
-
 		validate(dtoToSave);
-
-		PointOfEntry pointOfEntry = null;
-		if (dtoToSave.getUuid() != null) {
-			pointOfEntry = service.getByUuid(dtoToSave.getUuid());
-		}
-
-		if (pointOfEntry == null) {
-			List<PointOfEntry> duplicates = findDuplicates(dtoToSave);
-			if (!duplicates.isEmpty()) {
-				if (allowMerge) {
-					mergeAndSave(dtoToSave, duplicates);
-				} else {
-					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importPointOfEntryAlreadyExists));
-				}
-			}
-		}
-
-		return persist(dtoToSave, pointOfEntry);
+		return save(dtoToSave, allowMerge, Validations.importPointOfEntryAlreadyExists);
 	}
 
 	@Override

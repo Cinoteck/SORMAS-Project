@@ -591,24 +591,8 @@ public class FacilityFacadeEjb extends AbstractInfrastructureEjb<Facility, Facil
 
 	@Override
 	public FacilityDto save(@Valid FacilityDto dtoToSave, boolean allowMerge) throws ValidationRuntimeException {
-
 		validateFacilityDto(dtoToSave);
-
-		Facility facility = service.getByUuid(dtoToSave.getUuid());
-
-		if (facility == null) {
-			List<Facility> duplicates = findDuplicates(dtoToSave);
-
-			if (!duplicates.isEmpty()) {
-				if (allowMerge) {
-					mergeAndSave(dtoToSave, duplicates);
-				} else {
-					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importFacilityAlreadyExists));
-				}
-			}
-		}
-
-		return persist(dtoToSave, facility);
+		return save(dtoToSave, allowMerge, Validations.importFacilityAlreadyExists);
 	}
 
 	@Override

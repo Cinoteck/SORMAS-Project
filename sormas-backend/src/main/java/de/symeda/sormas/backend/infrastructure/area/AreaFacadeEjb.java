@@ -111,20 +111,7 @@ public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, Area
 
 	@Override
 	public AreaDto save(@Valid AreaDto dtoToSave, boolean allowMerge) {
-		Area existingEntity = service.getByUuid(dtoToSave.getUuid());
-
-		if (existingEntity == null) {
-			List<Area> duplicates = findDuplicates(dtoToSave);
-			if (!duplicates.isEmpty()) {
-				if (allowMerge) {
-					return mergeAndSave(dtoToSave, duplicates);
-				} else {
-					throw new ValidationRuntimeException(I18nProperties.getValidationError(Validations.importAreaAlreadyExists));
-				}
-			}
-		}
-		return persist(dtoToSave, existingEntity);
-
+		return save(dtoToSave, allowMerge, Validations.importAreaAlreadyExists);
 	}
 
 	@Override
