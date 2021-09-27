@@ -159,6 +159,7 @@ public class AreaFacadeEjb extends AbstractInfrastructureEjb<Area, AreaDto, Area
 		return service.getByExternalId(externalId, includeArchivedEntities).stream().map(AreaFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
+	@Override
 	public AreaDto toDto(Area source) {
 		if (source == null) {
 			return null;

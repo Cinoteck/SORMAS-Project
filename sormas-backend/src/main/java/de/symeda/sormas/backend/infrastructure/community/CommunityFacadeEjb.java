@@ -337,6 +337,7 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 		return dto;
 	}
 
+	@Override
 	public CommunityDto toDto(Community entity) {
 
 		if (entity == null) {
@@ -355,6 +356,7 @@ public class CommunityFacadeEjb extends AbstractInfrastructureEjb<Community, Com
 		return dto;
 	}
 
+	@Override
 	protected void fillOrBuildEntity(@NotNull CommunityDto source, Community target, boolean checkChangeDate) {
 		target = DtoHelper.fillOrBuildEntity(source, target, Community::new, checkChangeDate);
 

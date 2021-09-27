@@ -171,6 +171,7 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 		return QueryHelper.getResultList(em, cq, first, max, this::toIndexDto);
 	}
 
+	@Override
 	public Page<CountryIndexDto> getIndexPage(CountryCriteria countryCriteria, Integer offset, Integer size, List<SortProperty> sortProperties) {
 		List<CountryIndexDto> countryIndexList = getIndexList(countryCriteria, offset, size, sortProperties);
 		long totalElementCount = count(countryCriteria);
@@ -249,6 +250,7 @@ public class CountryFacadeEjb extends AbstractInfrastructureEjb<Country, Country
 			entity.getIsoCode());
 	}
 
+	@Override
 	public CountryDto toDto(Country entity) {
 		if (entity == null) {
 			return null;

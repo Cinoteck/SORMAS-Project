@@ -205,6 +205,7 @@ public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, Con
 		return service.count((cb, root) -> service.buildCriteriaFilter(criteria, cb, root));
 	}
 
+	@Override
 	public ContinentDto toDto(Continent entity) {
 		if (entity == null) {
 			return null;
@@ -236,14 +237,17 @@ public class ContinentFacadeEjb extends AbstractInfrastructureEjb<Continent, Con
 		return dto;
 	}
 
+	@Override
 	public List<ContinentReferenceDto> getByExternalId(String externalId, boolean includeArchived) {
 		return service.getByExternalId(externalId, includeArchived).stream().map(ContinentFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
+	@Override
 	public List<ContinentReferenceDto> getReferencesByName(String name, boolean includeArchived) {
 		return service.getByDefaultName(name, includeArchived).stream().map(ContinentFacadeEjb::toReferenceDto).collect(Collectors.toList());
 	}
 
+	@Override
 	protected void fillOrBuildEntity(@NotNull ContinentDto source, Continent target, boolean checkChangeDate) {
 		target = DtoHelper.fillOrBuildEntity(source, target, Continent::new, checkChangeDate);
 
