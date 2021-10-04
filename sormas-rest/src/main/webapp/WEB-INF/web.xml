@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="sormas-rest-app" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+	version="3.1">
+	
+	<display-name>SORMAS Rest Interface</display-name>
+
+	<security-role>
+		<role-name>USER</role-name>
+    </security-role>
+	<security-role>
+		<role-name>REST_EXTERNAL_VISITS_USER</role-name>
+    </security-role>
+	<security-role>
+		<role-name>REST_USER</role-name>
+    </security-role>
+	<security-role>
+        <role-name>SURVEILLANCE_OFFICER</role-name>
+    </security-role>
+	<security-role>
+        <role-name>HOSPITAL_INFORMANT</role-name>
+    </security-role>
+	<security-role>
+        <role-name>CASE_OFFICER</role-name>
+    </security-role>
+	<security-role>
+        <role-name>CONTACT_OFFICER</role-name>
+    </security-role>
+	<security-role>
+        <role-name>SORMAS_TO_SORMAS_CLIENT</role-name>
+    </security-role>
+	<security-role>
+        <role-name>BAG_USER</role-name>
+    </security-role>
+
+</web-app>
